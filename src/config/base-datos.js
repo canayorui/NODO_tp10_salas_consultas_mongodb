@@ -15,7 +15,7 @@ async function conectarBaseDatos() {
     throw error;
   }
 
-  if (!mongodbUri.startsWith("mongodb+srv://")) {
+ if (!mongodbUri.startsWith("mongodb+srv://")) {
     const error = new Error(
       "Formato de MONGODB_URI inválido: se esperaba una URI de Atlas mongodb+srv://",
     );
@@ -34,9 +34,9 @@ async function conectarBaseDatos() {
     throw error;
   }
 
-  if (baseDatos !== "reservas_salas_u8") {
+  if (baseDatos !== "reservas_salas_u9") {
     const error = new Error(
-      "MONGODB_URI debe apuntar a la base de datos reservas_salas_u8",
+      "MONGODB_URI debe apuntar a la base de datos reservas_salas_u9",
     );
     error.code = "MONGODB_DATABASE_INVALID";
     throw error;
