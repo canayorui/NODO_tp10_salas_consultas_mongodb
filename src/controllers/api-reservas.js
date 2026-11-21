@@ -103,7 +103,77 @@ function crearControladorApiReservas(servicio) {
         .location(`/api/reservas/${recurso.id}`)
         .json(recurso);
     },
+    async actualizarCompleto(req, res) {
+      const { id } = req.params;
+
+      if (!/^[a-f\d]{24}$/i.test(id)) {
+        return res.status(400).json({ error: "ID inválido" });
+      }
+
+      const body = req.body;
+      if (!body || typeof body !== "object" || Array.isArray(body)) {
+        return res.status(400).json({
+          error: "datos invalidos",
+        });
+      }
+      const camposObligatorios = [
+        "estudiante",
+        "email",
+        "sala",
+        "fecha",
+        "turno",
+        "personas",
+        "estado",
+      ];
+      for (const campo of camposObligatorios) {
+        if (!(campo in body)) {
+          return res.status(400).json({
+            error: "PUT requiere todos los campos",
+          });
+        }
+      }
+      const reservas = await servicio.actualizarCompleto(id, body);
+      if (!reservas) {
+        return res.status(404).json({ error: "Reserva no encontrada" });
+      }
+      return res.json(representarReserva(reservas));
+    },
+
+    async actualizarParcial(req, res) {
+      const { id } = req.params;
+
+      if (!/^[a-f\d]{24}$/i.test(id)) {
+        return res.status(400).json({ error: "ID inválido" });
+      }
+
+      const body = req.body;
+      if (!body || typeof body !== "object" || Array.isArray(body)) {
+        return res.status(400).json({ error: "datos invalidos" });
+      }
+      const camposPermitidos = ["personas", "estado"];
+      const campos = Object.keys(body);
+      if (campos.some((campo) => !camposPermitidos.includes(campo))) {
+        return res
+          .status(400)
+          .json({ error: "PATCH solo admite personas y estado" });
+      }
+      const reserva = await servicio.actualizarParcial(id, body);
+      if (!reserva) {
+        return res.status(404).json({ error: "Reserva no encontrada" });
+      }
+      return res.json(representarReserva(reserva));
+    },
+    async eliminar(req, res) {
+      const { id } = req.params;
+      if (!/^[a-f\d]{24}$/i.test(id)) {
+        return res.status(400).json({ error: "ID inválido" });
+      }
+      const reserva = await servicio.eliminar(id);
+      if (!reserva) {
+        return res.status(404).json({ error: "Reserva no encontrada" });
+      }
+      return res.status(204).end();
+    },
   };
 }
-
 module.exports = crearControladorApiReservas;

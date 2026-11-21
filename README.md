@@ -1,29 +1,57 @@
-# Trabajo práctico 08: reservas de salas con HTTP y MongoDB
+#TP09 - CRUD de reservas de salas con MongoDB
 
-## Origen y alcance
+Este trabajo parte de una copia funcional del TP08.
 
-Proyecto individual basado en la copia funcional del TP07. Conserva el sitio
-HTML y migra las operaciones de reservas a MongoDB Atlas: tanto el sitio como la
-API JSON usan el mismo servicio asíncrono y la colección `reservas` de la base
-`reservas_salas_u8`. El arreglo inicial en memoria dejó de importarse al
-arranque; los documentos no se cargan ni se crean automáticamente al iniciar o
-listar.
+Node.js
+Express 5
+MongoDB Atlas M0
+Mongoose
+Postman
 
-La aplicación usa CommonJS, Node.js 20.19 o superior, npm, Express 4 y Mongoose
-9. Se mantienen las versiones declaradas en `package.json` y
-`package-lock.json`.
+reservas_salas_u9
+reservas
+npm install
 
-## Preparación y arranque
+PORT=3000 NODE_ENV=development MONGODB_URI=mongodb+srv://USUARIO:CLAVE@HOST/reservas_salas_u9?retryWrites=true&w=majority
 
-1. Preparar un clúster MongoDB Atlas Free (M0), un usuario con permisos de
-   lectura/escritura y permitir en Network Access la IP de la máquina que hará
-   las pruebas.
-2. Copiar `.env.example` a `.env` y sustituir los marcadores de `MONGODB_URI`
-   por la URI privada de Atlas. Mantener la base `reservas_salas_u8`; no
-   compartir ni versionar `.env`.
-3. Instalar dependencias con `npm install`.
-4. Iniciar el servidor desde la raíz con `npm start` (equivale a
-   `node --env-file=.env src/index.js`).
+npm start
+
+Método	Ruta
+GET	/api/reservas
+GET	/api/reservas/:id
+POST	/api/reservas
+PUT	/api/reservas/:id
+PATCH	/api/reservas/:id
+DELETE	/api/reservas/:id
+
+{
+  "estudiante": "Ana Ejemplo",
+  "email": "ana@example.com",
+  "sala": "Sala Norte",
+  "fecha": "2026-10-21",
+  "turno": "Mañana",
+  "personas": 2
+}
+
+{
+  "estado": "confirmada"
+}
+
+Agregar tus capturas:
+
+POST → 201
+GET → 200
+PUT → 200
+PATCH → 200
+DELETE → 204
+GET posterior → 404
+
+Completar con los resultados reales obtenidos.
+
+En el TP08 se implementaron operaciones de creación y consulta.
+
+En el TP09 se agregaron operaciones de actualización completa (PUT), actualización parcial (PATCH) y eliminación (DELETE), completando el CRUD.
+
 
 El servidor espera la conexión a MongoDB antes de abrir el puerto. Si falta o
 no es válida la URI, o falla la conexión, no anuncia que el servidor está

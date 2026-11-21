@@ -15,7 +15,7 @@ async function conectarBaseDatos() {
     throw error;
   }
 
- if (!mongodbUri.startsWith("mongodb+srv://")) {
+  if (!mongodbUri.startsWith("mongodb+srv://")) {
     const error = new Error(
       "Formato de MONGODB_URI inválido: se esperaba una URI de Atlas mongodb+srv://",
     );
