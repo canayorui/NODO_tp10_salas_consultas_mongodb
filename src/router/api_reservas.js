@@ -12,7 +12,7 @@ function crearRouterApiReservas(controlador) {
   router.get("/", manejarErrorAsincrono(controlador.listar));
   router.get("/:id", manejarErrorAsincrono(controlador.detalle));
   router.post("/", manejarErrorAsincrono(controlador.crear));
-  router.put("/:id", manejarErrorAsincrono(controlador.actualizarCompleto));
+  router.put("/:id", manejarErrorAsincrono(controlador.actualizarCompleta));
   router.patch("/:id", manejarErrorAsincrono(controlador.actualizarParcial));
   router.delete("/:id", manejarErrorAsincrono(controlador.eliminar));
   return router;

@@ -1,10 +1,7 @@
-const dns = require("node:dns");
 const { URL } = require("node:url");
 const mongoose = require("mongoose");
 
 const leerConfiguracion = require("./entorno");
-
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 async function conectarBaseDatos() {
   const { mongodbUri } = leerConfiguracion();
@@ -34,9 +31,9 @@ async function conectarBaseDatos() {
     throw error;
   }
 
-  if (baseDatos !== "reservas_salas_u9") {
+  if (baseDatos !== "reservas_salas_u10") {
     const error = new Error(
-      "MONGODB_URI debe apuntar a la base de datos reservas_salas_u9",
+      "MONGODB_URI debe apuntar a la base de datos reservas_salas_u10",
     );
     error.code = "MONGODB_DATABASE_INVALID";
     throw error;

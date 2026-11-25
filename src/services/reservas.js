@@ -1,7 +1,46 @@
 const Reserva = require("../modelos/reserva");
 
-async function listar(filtro = {}) {
-  return Reserva.find(filtro);
+async function listar(
+  filtro = {},
+  orden = "estudiante",
+  limite = 0,
+  pagina = 1,
+) {
+  let criterioOrden;
+  switch (orden) {
+    case "personas-asc":
+      criterioOrden = {
+        personas: 1,
+        _id: 1,
+      };
+      break;
+
+    case "personas-desc":
+      criterioOrden = {
+        personas: -1,
+        _id: 1,
+      };
+      break;
+    default:
+      criterioOrden = {
+        estudiante: 1,
+        _id: 1,
+      };
+  }
+
+  const salto = (pagina - 1) * limite;
+  const total = await Reserva.countDocuments(filtro);
+  const datos = await Reserva.find(filtro)
+    .select("estudiante email sala fecha turno personas estado")
+    .sort(criterioOrden)
+    .skip(salto)
+    .limit(limite);
+  return {
+    datos,
+    total,
+    pagina,
+    limite,
+  };
 }
 async function buscarPorId(id) {
   return Reserva.findById(id);
@@ -13,7 +52,7 @@ async function crear(datos) {
 async function contar() {
   return Reserva.countDocuments();
 }
-async function actualizarCompleto(id, datos) {
+async function actualizarCompleta(id, datos) {
   return Reserva.findByIdAndUpdate(id, datos, {
     new: true,
     runValidators: true,
@@ -43,7 +82,7 @@ module.exports = {
   buscarPorId,
   crear,
   contar,
-  actualizarCompleto,
+  actualizarCompleta,
   actualizarParcial,
   eliminar,
 };

@@ -256,6 +256,46 @@ Para comprobar la persistencia:
 - JSON inválido.
 - Content-Type incorrecto.
 
+## Matriz de pruebas
+
+| Caso | Método | Entrada esperada | Resultado esperado |
+|---|---|---|---|
+| Listado | GET /api/reservas | Sin body | 200 |
+| Consulta existente | GET /api/reservas/:id | ObjectId válido | 200 |
+| ID con formato inválido | GET /api/reservas/:id | Texto distinto de ObjectId | 400 |
+| ID inexistente | GET /api/reservas/:id | ObjectId válido sin recurso | 404 |
+| Creación válida | POST /api/reservas | Datos válidos | 201 y header Location |
+| Email inválido | POST /api/reservas | email sin @ | 400 |
+| Sala inválida | POST /api/reservas | sala fuera del enum | 400 |
+| Turno inválido | POST /api/reservas | turno fuera del enum | 400 |
+| Personas mínimas | POST /api/reservas | personas 0 | 400 |
+| Personas máximas | POST /api/reservas | personas 7 | 400 |
+| Personas decimal | POST /api/reservas | personas 2.5 | 400 |
+| Personas texto | POST /api/reservas | personas "abc" | 400 |
+| Personas booleano | POST /api/reservas | personas true | 400 |
+| Personas array | POST /api/reservas | personas [] | 400 |
+| Personas objeto | POST /api/reservas | personas {} | 400 |
+| Actualización completa | PUT /api/reservas/:id | Todos los campos válidos | 200 |
+| Actualización parcial | PATCH /api/reservas/:id | personas o estado válido | 200 |
+| Eliminación | DELETE /api/reservas/:id | ObjectId existente | 204 |
+| Recurso eliminado | GET /api/reservas/:id | ID eliminado | 404 |
+| JSON malformado | POST, PUT o PATCH | JSON con sintaxis inválida | 400 |
+| Content-Type incorrecto | POST, PUT o PATCH | Tipo distinto de application/json | 400 |
+
+## Evidencias requeridas
+
+Antes de entregar, guardar capturas de:
+
+1. POST con respuesta 201 y encabezado `Location`.
+2. Documento creado en MongoDB Atlas.
+3. GET por ID con respuesta 200.
+4. PUT con respuesta 200.
+5. PATCH con respuesta 200.
+6. DELETE con respuesta 204.
+7. GET posterior con respuesta 404.
+8. Reinicio del servidor y consulta del mismo `_id`.
+9. Ejecución exitosa de `npm run check`.
+
 ## Evidencias
 
 Agregar las capturas de:
