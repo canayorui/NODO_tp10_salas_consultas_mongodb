@@ -1,4 +1,4 @@
-# TP09 - CRUD de reservas de salas con MongoDB
+# TP10 - Consultas avanzadas de reservas de salas con MongoDB
 
 ## Alumna
 
@@ -6,11 +6,13 @@ Sheyla Canayo
 
 ## Repositorio
 
-tp-09-salas-crud-mongodb
+tp-10-salas-consultas-mongodb
 
 ## Punto de partida
 
-Este trabajo fue desarrollado a partir de una copia funcional del TP08 - Endpoints persistentes de reservas de salas.
+Este trabajo práctico fue desarrollado a partir de una copia funcional del TP09 - CRUD de reservas de salas con MongoDB.
+
+La aplicación mantiene la arquitectura implementada en trabajos anteriores y amplía las capacidades de consulta de la API mediante filtros, ordenación, paginación y selección de campos.
 
 ## Tecnologías utilizadas
 
@@ -24,30 +26,42 @@ Este trabajo fue desarrollado a partir de una copia funcional del TP08 - Endpoin
 
 ## Base de datos
 
-- Base de datos: `reservas_salas_u9`
+- Base de datos: `reservas_salas_u10`
 - Colección: `reservas`
 
-## Instalación del proyecto
+## Configuración de MongoDB Atlas
 
-Instalar las dependencias:
+Se utilizó un clúster MongoDB Atlas Free (M0).
 
-```bash
-npm install
-```
+Para reproducir el entorno:
+
+1. Crear o reutilizar un clúster Atlas.
+2. Crear un usuario con permisos de lectura y escritura.
+3. Autorizar la dirección IP utilizada.
+4. Obtener la URI de conexión para Node.js.
+5. Configurar el archivo `.env`.
 
 ## Variables de entorno
 
-Crear un archivo `.env` a partir de `.env.example`.
+Crear un archivo `.env` tomando como referencia `.env.example`.
 
 Ejemplo:
 
 ```env
 PORT=3000
 NODE_ENV=development
-MONGODB_URI=mongodb+srv://USUARIO:CLAVE@HOST/reservas_salas_u9?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://USUARIO:CLAVE@HOST/reservas_salas_u10?retryWrites=true&w=majority
 ```
 
-**Importante:** el archivo `.env` no debe publicarse en GitHub.
+El archivo `.env` no se publica en GitHub.
+
+## Instalación
+
+Instalar dependencias:
+
+```bash
+npm install
+```
 
 ## Ejecución
 
@@ -57,283 +71,344 @@ Iniciar el servidor:
 npm start
 ```
 
-El servidor quedará disponible en:
+El sitio quedará disponible en:
 
 ```text
 http://localhost:3000
 ```
 
-## Estructura principal del proyecto
+La API estará disponible en:
 
 ```text
-src
+http://localhost:3000/api/reservas
+```
+
+## Estructura del proyecto
+
+```text
+src/
 │
-├── config
+├── config/
 │   ├── base-datos.js
 │   └── entorno.js
 │
-├── controllers
+├── controllers/
 │   ├── api-reservas.js
 │   └── reservas.js
 │
-├── modelos
+├── middleware/
+│
+├── modelos/
 │   └── reserva.js
 │
-├── router
+├── router/
 │   ├── api-reservas.js
 │   └── reservas.js
 │
-├── services
+├── services/
 │   └── reservas.js
 │
-├── middleware
+├── views/
 │
-├── views
-│
-└── public
+└── public/
 ```
 
 ## Modelo Reserva
 
-El modelo utiliza Mongoose y contiene los siguientes campos:
+La colección utiliza el siguiente esquema:
 
 | Campo | Tipo | Regla |
 |---------|---------|---------|
 | estudiante | String | Obligatorio |
-| email | String | Obligatorio |
+| email | String | Obligatorio y contiene @ |
 | sala | String | Enum |
 | fecha | String | Obligatorio |
 | turno | String | Enum |
 | personas | Number | Entero entre 1 y 6 |
 | estado | String | pendiente / confirmada |
 
-## Endpoints de la API
+## Endpoints disponibles
 
-| Método | Ruta |
-|----------|----------|
-| GET | /api/reservas |
-| GET | /api/reservas/:id |
-| POST | /api/reservas |
-| PUT | /api/reservas/:id |
-| PATCH | /api/reservas/:id |
-| DELETE | /api/reservas/:id |
-
-## Ejemplo de creación (POST)
-
-### URL
-
-```text
-http://localhost:3000/api/reservas
-```
-
-### Body
-
-```json
-{
-  "estudiante": "Ana Ejemplo",
-  "email": "ana@example.com",
-  "sala": "Sala Norte",
-  "fecha": "2026-10-21",
-  "turno": "Mañana",
-  "personas": 2
-}
-```
-
-### Resultado esperado
+### Listado
 
 ```http
-201 Created
+GET /api/reservas
 ```
 
-La respuesta incluye:
+### Consulta por ID
 
-- id
-- estudiante
-- email
-- sala
-- fecha
-- turno
-- personas
-- estado (pendiente)
-
-## Ejemplo de actualización completa (PUT)
-
-### URL
-
-```text
-http://localhost:3000/api/reservas/ID
+```http
+GET /api/reservas/:id
 ```
 
-### Body
+### Creación
+
+```http
+POST /api/reservas
+```
+
+### Actualización completa
+
+```http
+PUT /api/reservas/:id
+```
+
+### Actualización parcial
+
+```http
+PATCH /api/reservas/:id
+```
+
+### Eliminación
+
+```http
+DELETE /api/reservas/:id
+```
+
+## Funcionalidades incorporadas en TP10
+
+### 1. Filtro por sala
+
+Permite consultar únicamente las reservas de una sala determinada.
+
+Ejemplo:
+
+```http
+GET /api/reservas?sala=Sala Norte
+```
+
+Resultado esperado:
+
+- Devuelve únicamente reservas de Sala Norte.
+
+Si no existen coincidencias:
 
 ```json
-{
-  "estudiante": "Ana Actualizada",
-  "email": "ana@example.com",
-  "sala": "Sala Norte",
-  "fecha": "2026-10-25",
-  "turno": "Tarde",
-  "personas": 3,
-  "estado": "confirmada"
-}
+[]
 ```
 
-### Resultado esperado
+con estado HTTP:
 
 ```http
 200 OK
 ```
 
-## Ejemplo de actualización parcial (PATCH)
+---
 
-### URL
+### 2. Ordenación
+
+La API permite ordenar resultados utilizando el parámetro:
 
 ```text
-http://localhost:3000/api/reservas/ID
+orden
 ```
 
-### Body
+Opciones disponibles:
+
+```text
+estudiante
+personas-asc
+personas-desc
+```
+
+Ejemplos:
+
+```http
+GET /api/reservas?orden=estudiante
+```
+
+```http
+GET /api/reservas?orden=personas-asc
+```
+
+```http
+GET /api/reservas?orden=personas-desc
+```
+
+---
+
+### 3. Paginación
+
+Parámetros disponibles:
+
+```text
+pagina
+limite
+```
+
+Valores por defecto:
+
+```text
+pagina = 1
+limite = 2
+```
+
+Ejemplo:
+
+```http
+GET /api/reservas?pagina=2&limite=2
+```
+
+Respuesta:
 
 ```json
 {
-  "estado": "confirmada"
+  "datos": [],
+  "pagina": 2,
+  "limite": 2,
+  "total": 6,
+  "paginas": 3
 }
 ```
 
-### Resultado esperado
+Validaciones:
 
-```http
-200 OK
-```
+- pagina entre 1 y 1000.
+- limite entre 1 y 20.
 
-## Ejemplo de eliminación (DELETE)
+---
 
-### URL
+### 4. Selección de campos
+
+Las consultas recuperan únicamente los campos necesarios del recurso:
 
 ```text
-http://localhost:3000/api/reservas/ID
+estudiante
+email
+sala
+fecha
+turno
+personas
+estado
 ```
 
-### Resultado esperado
+manteniendo el identificador requerido para la representación de la respuesta.
 
-```http
-204 No Content
-```
+## Datos utilizados para las pruebas
 
-## Persistencia
+Se registraron seis reservas de prueba:
 
-Las reservas se almacenan en MongoDB Atlas y permanecen disponibles después de reiniciar el servidor.
+1. Ana Ejemplo
+2. Bruno Ejemplo
+3. Carla Ejemplo
+4. Diego Ejemplo
+5. Elena Ejemplo
+6. Fabian Ejemplo
 
-Para comprobar la persistencia:
+Distribuidas entre:
 
-1. Crear una reserva mediante POST.
-2. Guardar el ID devuelto.
-3. Reiniciar el servidor.
-4. Consultar nuevamente la reserva mediante GET.
-5. Verificar que el mismo ID sigue existiendo.
-
-## Pruebas realizadas
-
-### Casos exitosos
-
-- GET listado de reservas.
-- GET reserva por ID.
-- POST reserva válida.
-- PUT actualización completa.
-- PATCH actualización parcial.
-- DELETE eliminación de reserva.
-
-### Casos inválidos
-
-- ID inválido.
-- ID inexistente.
-- Email sin @.
-- Sala no permitida.
-- Turno no permitido.
-- Personas igual a 0.
-- Personas mayor a 6.
-- Personas decimal.
-- JSON inválido.
-- Content-Type incorrecto.
+- Sala Norte
+- Sala Sur
+- Sala Multimedia
 
 ## Matriz de pruebas
 
-| Caso | Método | Entrada esperada | Resultado esperado |
-|---|---|---|---|
-| Listado | GET /api/reservas | Sin body | 200 |
-| Consulta existente | GET /api/reservas/:id | ObjectId válido | 200 |
-| ID con formato inválido | GET /api/reservas/:id | Texto distinto de ObjectId | 400 |
-| ID inexistente | GET /api/reservas/:id | ObjectId válido sin recurso | 404 |
-| Creación válida | POST /api/reservas | Datos válidos | 201 y header Location |
-| Email inválido | POST /api/reservas | email sin @ | 400 |
-| Sala inválida | POST /api/reservas | sala fuera del enum | 400 |
-| Turno inválido | POST /api/reservas | turno fuera del enum | 400 |
-| Personas mínimas | POST /api/reservas | personas 0 | 400 |
-| Personas máximas | POST /api/reservas | personas 7 | 400 |
-| Personas decimal | POST /api/reservas | personas 2.5 | 400 |
-| Personas texto | POST /api/reservas | personas "abc" | 400 |
-| Personas booleano | POST /api/reservas | personas true | 400 |
-| Personas array | POST /api/reservas | personas [] | 400 |
-| Personas objeto | POST /api/reservas | personas {} | 400 |
-| Actualización completa | PUT /api/reservas/:id | Todos los campos válidos | 200 |
-| Actualización parcial | PATCH /api/reservas/:id | personas o estado válido | 200 |
-| Eliminación | DELETE /api/reservas/:id | ObjectId existente | 204 |
-| Recurso eliminado | GET /api/reservas/:id | ID eliminado | 404 |
-| JSON malformado | POST, PUT o PATCH | JSON con sintaxis inválida | 400 |
-| Content-Type incorrecto | POST, PUT o PATCH | Tipo distinto de application/json | 400 |
+### Filtro
 
-## Evidencias requeridas
+| Caso | Resultado esperado |
+|--------|--------|
+| Sala Norte | 4 reservas |
+| Sala Sur | 1 reserva |
+| Sala Multimedia | 1 reserva |
+| Sala inexistente | [] |
 
-Antes de entregar, guardar capturas de:
+### Orden
 
-1. POST con respuesta 201 y encabezado `Location`.
-2. Documento creado en MongoDB Atlas.
-3. GET por ID con respuesta 200.
-4. PUT con respuesta 200.
-5. PATCH con respuesta 200.
-6. DELETE con respuesta 204.
-7. GET posterior con respuesta 404.
-8. Reinicio del servidor y consulta del mismo `_id`.
-9. Ejecución exitosa de `npm run check`.
+| Caso | Resultado esperado |
+|--------|--------|
+| estudiante | Orden alfabético |
+| personas-asc | Menor a mayor |
+| personas-desc | Mayor a menor |
 
-## Evidencias
+### Paginación
 
-Agregar las capturas de:
+| Caso | Resultado esperado |
+|--------|--------|
+| pagina=1 limite=2 | primeras 2 reservas |
+| pagina=2 limite=2 | siguientes 2 reservas |
+| pagina=3 limite=2 | últimas 2 reservas |
+| pagina=4 limite=2 | [] |
 
-1. POST con respuesta 201.
-2. GET por ID con respuesta 200.
-3. PUT con respuesta 200.
-4. PATCH con respuesta 200.
-5. DELETE con respuesta 204.
-6. GET posterior con respuesta 404.
-7. Documento almacenado en MongoDB Atlas.
-8. Persistencia luego de reiniciar el servidor.
+### Casos inválidos
 
-## Diferencias respecto al TP08
+| Caso | Resultado esperado |
+|--------|--------|
+| pagina=0 | 400 |
+| pagina=1.5 | 400 |
+| limite=21 | 400 |
 
-En el TP08 se implementaron:
+## Persistencia
 
-- GET listado
-- GET por ID
+Los datos permanecen almacenados en MongoDB Atlas después de reiniciar el servidor.
+
+Para comprobarlo:
+
+1. Crear reservas.
+2. Reiniciar el servidor.
+3. Consultar nuevamente los mismos registros.
+4. Verificar que continúan existiendo.
+5. Confirmar la existencia de los documentos en MongoDB Atlas.
+
+## Comparación con el TP09
+
+### TP09
+
+Implementó:
+
+- GET
 - POST
+- PUT
+- PATCH
+- DELETE
 
-En el TP09 se agregaron:
+Completando el CRUD.
 
-- PUT para actualización completa
-- PATCH para actualización parcial
-- DELETE para eliminación
+### TP10
 
-Con estas operaciones se completa el CRUD del recurso Reserva.
+Incorpora:
+
+- Filtro por sala.
+- Ordenación.
+- Paginación.
+- Selección de campos.
+
+sin alterar el CRUD existente.
+
+## Pregunta conceptual
+
+### Si incorporáramos información de salas, ¿qué datos describen una sala y cuáles una reserva?
+
+Datos de una sala:
+
+- nombre
+- ubicación
+- capacidad
+- equipamiento disponible
+
+Datos de una reserva:
+
+- estudiante
+- email
+- fecha
+- turno
+- cantidad de personas
+- estado
+
+### ¿Conviene usar referencias o documentos embebidos?
+
+En este caso conviene utilizar referencias.
+
+Una misma sala puede tener muchas reservas diferentes a lo largo del tiempo. Utilizar referencias evita duplicar información de la sala en cada documento de reserva y simplifica la actualización de los datos propios de la sala.
 
 ## Calidad del código
 
-Verificación de formato:
+Formatear el proyecto:
 
 ```bash
 npm run format
 ```
 
-Verificación de calidad:
+Comprobar calidad:
 
 ```bash
 npm run check
@@ -343,8 +418,33 @@ npm run check
 
 No se publican:
 
-- Credenciales
+- credenciales
+- contraseñas
 - URI privadas
-- Archivos .env
-- node_modules
-- Datos personales reales
+- archivos `.env`
+- datos personales reales
+- carpetas `node_modules`
+
+## Ejemplosen postman:
+
+- GET /api/reservas:
+![RESERVAS](<imagenes/Captura de pantalla 2026-11-25 205612.png>)
+
+- GET /api/reservas?sala=Sala Norte:
+![busqueda por sala](<imagenes/Captura de pantalla 2026-11-25 210151.png>)
+
+- GET /api/reservas?orden=personas-asc
+![personas en orden ascendente](<imagenes/Captura de pantalla 2026-11-25 210426.png>)
+
+- GET /api/reservas?pagina=1&limite=2
+![pagina y limite](<imagenes/Captura de pantalla 2026-11-25 210535.png>)
+
+- GET /api/reservas?pagina=4&limite=2
+![alt text](<imagenes/Captura de pantalla 2026-11-25 210638.png>)
+
+- Casos inválidos (pagina=0, limite=21, etc.)
+![pagina=0, limite=21](<imagenes/Captura de pantalla 2026-11-25 210903.png>)
+![pagina = 4, limite1.3](<imagenes/Captura de pantalla 2026-11-25 211226.png>)
+
+- MongoDB Atlas mostrando las 6 reservas
+![reservas](<imagenes/Captura de pantalla 2026-11-25 213045.png>)

@@ -3,8 +3,8 @@ const Reserva = require("../modelos/reserva");
 async function listar(
   filtro = {},
   orden = "estudiante",
-  limite = 0,
   pagina = 1,
+  limite = 0,
 ) {
   let criterioOrden;
   switch (orden) {
